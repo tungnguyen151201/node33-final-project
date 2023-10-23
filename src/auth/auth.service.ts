@@ -1,32 +1,34 @@
-import * as bcrypt from 'bcrypt';
 import {
   Injectable,
-  ConflictException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { SignUpDto } from './dto/auth.dto';
-import { PrismaClient } from '@prisma/client';
-import { User } from 'src/user/entities/user.entity';
-
+import { SignInDto } from './dto/auth.dto';
+import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
-  model = new PrismaClient();
-  user = this.model.user;
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+  ) {}
+  async signUp(signUpDto: CreateUserDto) {
+    return this.userService.create(signUpDto);
+  }
 
-  async signUp(signUpDto: SignUpDto) {
+  async signIn(signInDto: SignInDto) {
     try {
-      const { email, password } = signUpDto;
-
-      const checkEmail: User[] = await this.user.findMany({ where: { email } });
-      if (checkEmail.length > 0) {
-        throw new ConflictException('Email existed!');
+      const { email, password } = signInDto;
+      const user = (await this.userService.findOneByEmail(email)).data;
+      if (!bcrypt.compareSync(password, user.password)) {
+        throw new UnauthorizedException();
       }
-
-      const newUser: SignUpDto = signUpDto;
-      newUser.password = bcrypt.hashSync(password, 10);
-
-      const data = await this.user.create({ data: newUser });
-      return { isSuccess: true, data };
+      const payload = { sub: user.id, email: user.email };
+      return {
+        accessToken: await this.jwtService.signAsync(payload),
+      };
     } catch (e) {
       if (e.status === 500) {
         throw new InternalServerErrorException(e.message);

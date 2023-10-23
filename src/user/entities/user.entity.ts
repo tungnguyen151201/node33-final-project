@@ -1,3 +1,5 @@
+import { UserRole } from 'src/auth/enum/user-role.enum';
+
 export class User {
   id: number;
   email: string;
@@ -6,5 +8,5 @@ export class User {
   phone: string;
   birthday: string;
   gender: string;
-  role: string;
+  role: UserRole;
 }

@@ -1,30 +1,16 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class SignUpDto {
+export class SignInDto {
+  /**
+   * @example 'admin@gmail.com'
+   */
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
+  /**
+   * @example '123456'
+   */
   @IsNotEmpty()
-  password: string;
-
-  @IsNotEmpty()
-  name: string;
-
-  @IsNotEmpty()
-  phone: string;
-
-  @IsNotEmpty()
-  birthday: string;
-
-  @IsNotEmpty()
-  gender: string;
-
-  @IsNotEmpty()
-  role: string;
-}
-
-export class SignInDto {
-  email: string;
   password: string;
 }
