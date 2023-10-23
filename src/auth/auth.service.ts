@@ -8,20 +8,21 @@ import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserEntity } from 'src/user/entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
-  async signUp(signUpDto: CreateUserDto) {
+  async signUp(signUpDto: CreateUserDto): Promise<UserEntity> {
     return this.userService.create(signUpDto);
   }
 
   async signIn(signInDto: SignInDto) {
     try {
       const { email, password } = signInDto;
-      const user = (await this.userService.findOneByEmail(email)).data;
+      const user = await this.userService.findOneByEmail(email);
       if (!bcrypt.compareSync(password, user.password)) {
         throw new UnauthorizedException();
       }

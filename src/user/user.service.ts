@@ -2,22 +2,25 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'prisma/prisma.service';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  model = new PrismaClient();
-  user = this.model.user;
-  async create(createUserDto: CreateUserDto) {
+  constructor(private prisma: PrismaService) {}
+
+  private user = this.prisma.user;
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     try {
       const { email, password } = createUserDto;
 
       const checkEmail = await this.findOneByEmail(email);
-      if (checkEmail.data) {
+      if (checkEmail) {
         throw new ConflictException('Email existed!');
       }
 
@@ -25,7 +28,7 @@ export class UserService {
       newUser.password = bcrypt.hashSync(password, 10);
 
       const data = await this.user.create({ data: newUser });
-      return { data };
+      return new UserEntity({ ...data });
     } catch (e) {
       if (e.status === 500) {
         throw new InternalServerErrorException(e.message);
@@ -33,12 +36,26 @@ export class UserService {
     }
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(): Promise<UserEntity[]> {
+    try {
+      const data = await this.user.findMany();
+      return data.map((user) => new UserEntity({ ...user }));
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<UserEntity> {
+    try {
+      const data = await this.user.findUnique({ where: { id } });
+      return new UserEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 
   async findOneByEmail(email: string) {
@@ -46,7 +63,7 @@ export class UserService {
       const data = await this.user.findFirst({
         where: { email },
       });
-      return { data };
+      return new UserEntity({ ...data });
     } catch (e) {
       if (e.status === 500) {
         throw new InternalServerErrorException(e.message);
@@ -54,8 +71,22 @@ export class UserService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.user.findUnique({ where: { id } });
+      if (!user) {
+        throw new NotFoundException('User not found!');
+      }
+      const data = await this.user.update({
+        where: { id },
+        data: { ...updateUserDto },
+      });
+      return new UserEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 
   remove(id: number) {

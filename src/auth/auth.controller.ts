@@ -1,26 +1,36 @@
-import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/auth.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Public } from 'src/decorators/public.decorator';
+import { UserEntity } from 'src/user/entities/user.entity';
 
-@ApiTags('Auth')
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiBody({ type: CreateUserDto })
-  @Public()
   @Post('/signup')
-  signUp(@Body() signUpDto: CreateUserDto) {
+  @Public()
+  @ApiBody({ type: CreateUserDto })
+  signUp(@Body() signUpDto: CreateUserDto): Promise<UserEntity> {
     return this.authService.signUp(signUpDto);
   }
 
-  @ApiBody({ type: SignInDto })
-  @HttpCode(HttpStatus.OK)
-  @Public()
   @Post('/signin')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: SignInDto })
   signIn(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto);
   }

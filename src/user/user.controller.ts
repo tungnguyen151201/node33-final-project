@@ -3,9 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,21 +15,24 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { UserRole } from 'src/auth/enum/user-role.enum';
+import { Public } from 'src/decorators/public.decorator';
+import { UserEntity } from './entities/user.entity';
 
+@Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('User')
 @ApiBearerAuth()
-@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  @Public()
+  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     return this.userService.create(createUserDto);
   }
 
-  @Roles(UserRole.Admin)
   @Get()
-  findAll() {
+  findAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
 
@@ -41,12 +46,16 @@ export class UserController {
     return this.userService.findOneByEmail(email);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
 
+  /**
+   * Only Admin can delete user
+   */
   @Delete(':id')
+  @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }

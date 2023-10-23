@@ -1,12 +1,19 @@
-import { UserRole } from 'src/auth/enum/user-role.enum';
+import { Exclude } from 'class-transformer';
 
-export class User {
+export class UserEntity {
   id: number;
   email: string;
+
+  @Exclude()
   password: string;
+
   name: string;
   phone: string;
   birthday: string;
   gender: string;
-  role: UserRole;
+  role: string;
+
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial);
+  }
 }

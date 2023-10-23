@@ -16,7 +16,7 @@ import { RolesGuard } from './guards/roles.guard';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: '1d' },
     }),
     ConfigModule.forRoot(),
   ],
