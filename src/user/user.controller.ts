@@ -10,9 +10,12 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/decorators/role.decorator';
+import { UserRole } from 'src/auth/enum/user-role.enum';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -22,6 +25,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Roles(UserRole.Admin)
   @Get()
   findAll() {
     return this.userService.findAll();
