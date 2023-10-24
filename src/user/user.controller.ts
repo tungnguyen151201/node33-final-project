@@ -8,11 +8,12 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { UserRole } from 'src/auth/enum/user-role.enum';
 import { Public } from 'src/decorators/public.decorator';
@@ -35,14 +36,21 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  @Get('search-pagination')
+  @ApiQuery({ name: 'pageIndex', type: Number })
+  @ApiQuery({ name: 'pageSize', type: Number })
+  @ApiQuery({ name: 'keyword', required: false })
+  searchPagination(
+    @Query('pageIndex') pageIndex: string,
+    @Query('pageSize') pageSize: string,
+    @Query('keyword') keyword?: string,
+  ) {
+    return this.userService.searchPagination(pageIndex, pageSize, keyword);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
-  }
-
-  @Get('search-email/:email')
-  findOneByEmail(@Param('email') email: string) {
-    return this.userService.findOneByEmail(email);
   }
 
   @Put(':id')
@@ -57,5 +65,15 @@ export class UserController {
   @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Get('search/:name')
+  search(@Param('name') keyword: string) {
+    return this.userService.search(keyword);
+  }
+
+  @Get('search-email/:email')
+  findOneByEmail(@Param('email') email: string) {
+    return this.userService.findOneByEmail(email);
   }
 }

@@ -120,4 +120,49 @@ export class UserService {
       } else throw e;
     }
   }
+
+  async search(keyword: string) {
+    try {
+      const data = await this.user.findMany({
+        where: {
+          name: {
+            contains: keyword,
+          },
+        },
+      });
+      if (!data) return [];
+      return data.map((user) => new UserEntity({ ...user }));
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
+  }
+
+  async searchPagination(
+    pageIndex: string,
+    pageSize: string,
+    keyword?: string,
+  ) {
+    try {
+      const page = Number.parseInt(pageIndex);
+      const size = Number.parseInt(pageSize);
+
+      const data = await this.user.findMany({
+        skip: (page - 1) * size,
+        take: size,
+        where: {
+          name: {
+            contains: keyword,
+          },
+        },
+      });
+      if (!data) return [];
+      return data.map((user) => new UserEntity({ ...user }));
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
+  }
 }
