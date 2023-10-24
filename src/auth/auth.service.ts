@@ -8,14 +8,13 @@ import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from 'src/user/entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
-  async signUp(signUpDto: CreateUserDto): Promise<UserEntity> {
+  async signUp(signUpDto: CreateUserDto) {
     return this.userService.create(signUpDto);
   }
 

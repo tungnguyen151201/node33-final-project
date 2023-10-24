@@ -12,7 +12,6 @@ import { SignInDto } from './dto/auth.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { UserEntity } from 'src/user/entities/user.entity';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -23,7 +22,7 @@ export class AuthController {
   @Post('/signup')
   @Public()
   @ApiBody({ type: CreateUserDto })
-  signUp(@Body() signUpDto: CreateUserDto): Promise<UserEntity> {
+  signUp(@Body() signUpDto: CreateUserDto) {
     return this.authService.signUp(signUpDto);
   }
 

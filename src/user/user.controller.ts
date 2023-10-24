@@ -16,7 +16,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { UserRole } from 'src/auth/enum/user-role.enum';
 import { Public } from 'src/decorators/public.decorator';
-import { UserEntity } from './entities/user.entity';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -27,12 +26,12 @@ export class UserController {
 
   @Post()
   @Public()
-  create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll(): Promise<UserEntity[]> {
+  findAll() {
     return this.userService.findAll();
   }
 

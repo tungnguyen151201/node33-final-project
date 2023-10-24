@@ -15,17 +15,24 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   private user = this.prisma.user;
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto) {
     try {
-      const { email, password } = createUserDto;
+      const { email } = createUserDto;
 
       const checkEmail = await this.findOneByEmail(email);
       if (checkEmail) {
         throw new ConflictException('Email existed!');
       }
 
-      const newUser: CreateUserDto = createUserDto;
-      newUser.password = bcrypt.hashSync(password, 10);
+      const newUser: CreateUserDto = {
+        email: createUserDto.email,
+        password: bcrypt.hashSync(createUserDto.password, 10),
+        name: createUserDto.name,
+        phone: createUserDto.phone,
+        birthday: createUserDto.birthday,
+        gender: createUserDto.gender,
+        role: createUserDto.role,
+      };
 
       const data = await this.user.create({ data: newUser });
       return new UserEntity({ ...data });
@@ -36,9 +43,10 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<UserEntity[]> {
+  async findAll() {
     try {
       const data = await this.user.findMany();
+      if (!data) return [];
       return data.map((user) => new UserEntity({ ...user }));
     } catch (e) {
       if (e.status === 500) {
@@ -47,9 +55,10 @@ export class UserService {
     }
   }
 
-  async findOne(id: number): Promise<UserEntity> {
+  async findOne(id: number) {
     try {
       const data = await this.user.findUnique({ where: { id } });
+      if (!data) return null;
       return new UserEntity({ ...data });
     } catch (e) {
       if (e.status === 500) {
@@ -63,6 +72,7 @@ export class UserService {
       const data = await this.user.findFirst({
         where: { email },
       });
+      if (!data) return null;
       return new UserEntity({ ...data });
     } catch (e) {
       if (e.status === 500) {
@@ -79,7 +89,14 @@ export class UserService {
       }
       const data = await this.user.update({
         where: { id },
-        data: { ...updateUserDto },
+        data: {
+          email: updateUserDto.email,
+          name: updateUserDto.name,
+          phone: updateUserDto.phone,
+          birthday: updateUserDto.birthday,
+          gender: updateUserDto.gender,
+          role: updateUserDto.role,
+        },
       });
       return new UserEntity({ ...data });
     } catch (e) {
@@ -89,7 +106,18 @@ export class UserService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    try {
+      const user = await this.user.findUnique({ where: { id } });
+      if (!user) {
+        throw new NotFoundException('User not found!');
+      }
+      const data = await this.user.delete({ where: { id } });
+      return new UserEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 }
