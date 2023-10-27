@@ -8,11 +8,19 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
+import { RoomModule } from './room/room.module';
+import { LocationModule } from './location/location.module';
+import { ReviewModule } from './review/review.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    RoomModule,
+    LocationModule,
+    ReviewModule,
+    BookingModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
