@@ -126,17 +126,20 @@ export class LocationService {
     }
   }
 
-  async uploadImage(req: any) {
+  async uploadImage(id: number, file: Express.Multer.File) {
     try {
-      if (!req.file) {
+      if (!id) {
+        throw new BadRequestException('Invalid params');
+      }
+      if (!file) {
         throw new InternalServerErrorException(
           'Upload failed. Please try again later!',
         );
       }
       const data = await this.location.update({
-        where: { id: req.user.id },
+        where: { id },
         data: {
-          image: '/public/img' + req.file.filename,
+          image: '/public/img' + file.filename,
         },
       });
 

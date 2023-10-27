@@ -9,7 +9,7 @@ import {
   UseInterceptors,
   Put,
   Query,
-  Request,
+  UploadedFile,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
@@ -84,7 +84,10 @@ export class LocationController {
       }),
     }),
   )
-  uploadImage(@Request() req: any) {
-    return this.locationService.uploadImage(req);
+  uploadImage(
+    @Query('locationId') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.locationService.uploadImage(+id, file);
   }
 }
