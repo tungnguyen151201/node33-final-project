@@ -90,7 +90,7 @@ export class UserService {
       if (!id) {
         throw new BadRequestException('Invalid params');
       }
-      const user = await this.user.findUnique({ where: { id } });
+      const user = await this.findOne(id);
       if (!user) {
         throw new NotFoundException('User not found!');
       }
@@ -118,7 +118,7 @@ export class UserService {
       if (!id) {
         throw new BadRequestException('Invalid params');
       }
-      const user = await this.user.findUnique({ where: { id } });
+      const user = await this.findOne(id);
       if (!user) {
         throw new NotFoundException('User not found!');
       }

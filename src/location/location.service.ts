@@ -57,7 +57,7 @@ export class LocationService {
       if (!id) {
         throw new BadRequestException('Invalid params');
       }
-      const location = await this.location.findUnique({ where: { id } });
+      const location = await this.findOne(id);
       if (!location) {
         throw new NotFoundException('Location not found!');
       }
@@ -83,7 +83,7 @@ export class LocationService {
       if (!id) {
         throw new BadRequestException('Invalid params');
       }
-      const location = await this.location.findUnique({ where: { id } });
+      const location = await this.findOne(id);
       if (!location) {
         throw new NotFoundException('Location not found!');
       }
@@ -130,6 +130,10 @@ export class LocationService {
     try {
       if (!id) {
         throw new BadRequestException('Invalid params');
+      }
+      const room = await this.findOne(id);
+      if (!room) {
+        throw new NotFoundException('Room not found!');
       }
       if (!file) {
         throw new InternalServerErrorException(

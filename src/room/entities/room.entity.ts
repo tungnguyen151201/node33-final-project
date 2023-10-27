@@ -6,7 +6,7 @@ export class RoomEntity {
   guest: number;
   bedroom: number;
   bed: number;
-  description: number;
+  description: string;
   price: number;
   washingMachine: boolean;
   iron: boolean;
