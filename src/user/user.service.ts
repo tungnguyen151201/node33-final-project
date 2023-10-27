@@ -165,4 +165,26 @@ export class UserService {
       } else throw e;
     }
   }
+
+  async uploadAvatar(req: any) {
+    try {
+      if (!req.file) {
+        throw new InternalServerErrorException(
+          'Upload failed. Please try again later!',
+        );
+      }
+      const data = await this.user.update({
+        where: { id: req.user.id },
+        data: {
+          avatar: '/public/img' + req.file.filename,
+        },
+      });
+
+      return new UserEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
+  }
 }

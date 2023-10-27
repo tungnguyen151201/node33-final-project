@@ -79,6 +79,7 @@ model User {
   birthday String?   @db.VarChar(255)
   gender   String?   @db.VarChar(255)
   role     String?   @db.VarChar(255)
+  avatar   String?   @db.VarChar(255)
   Booking  Booking[]
   Review   Review[]
 }

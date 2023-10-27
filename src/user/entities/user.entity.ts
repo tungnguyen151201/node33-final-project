@@ -12,6 +12,7 @@ export class UserEntity {
   birthday: string;
   gender: string;
   role: string;
+  avatar: string;
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);

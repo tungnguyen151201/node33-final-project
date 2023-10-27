@@ -9,14 +9,24 @@ import {
   UseInterceptors,
   Put,
   Query,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiQuery,
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { UserRole } from 'src/auth/enum/user-role.enum';
 import { Public } from 'src/decorators/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadAvatarDto } from './dto/upload-avatar.dto';
+import { diskStorage } from 'multer';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -70,6 +80,22 @@ export class UserController {
   @Get('search/:name')
   search(@Param('name') keyword: string) {
     return this.userService.search(keyword);
+  }
+
+  @Post('upload-avatar')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadAvatarDto })
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: process.cwd() + '/public/img',
+        filename: (_, file, callback) =>
+          callback(null, new Date().getTime() + '_' + file.originalname),
+      }),
+    }),
+  )
+  uploadAvatar(@Request() req: any) {
+    return this.userService.uploadAvatar(req);
   }
 
   @Get('search-email/:email')
