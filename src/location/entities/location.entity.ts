@@ -4,4 +4,8 @@ export class LocationEntity {
   province: string;
   country: string;
   image: string;
+
+  constructor(partial: Partial<LocationEntity>) {
+    Object.assign(this, partial);
+  }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -57,6 +58,9 @@ export class UserService {
 
   async findOne(id: number) {
     try {
+      if (!id) {
+        throw new BadRequestException('Invalid params');
+      }
       const data = await this.user.findUnique({ where: { id } });
       if (!data) return null;
       return new UserEntity({ ...data });
@@ -83,6 +87,9 @@ export class UserService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
+      if (!id) {
+        throw new BadRequestException('Invalid params');
+      }
       const user = await this.user.findUnique({ where: { id } });
       if (!user) {
         throw new NotFoundException('User not found!');
@@ -108,6 +115,9 @@ export class UserService {
 
   async remove(id: number) {
     try {
+      if (!id) {
+        throw new BadRequestException('Invalid params');
+      }
       const user = await this.user.findUnique({ where: { id } });
       if (!user) {
         throw new NotFoundException('User not found!');
@@ -145,6 +155,9 @@ export class UserService {
     keyword?: string,
   ) {
     try {
+      if (!pageIndex || !pageSize) {
+        throw new BadRequestException('Invalid params');
+      }
       const page = Number.parseInt(pageIndex);
       const size = Number.parseInt(pageSize);
 
