@@ -3,11 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ClassSerializerInterceptor,
   UseInterceptors,
+  Request,
+  Put,
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -22,8 +23,8 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewService.create(createReviewDto);
+  create(@Body() createReviewDto: CreateReviewDto, @Request() req: any) {
+    return this.reviewService.create(createReviewDto, req);
   }
 
   @Get()
@@ -36,9 +37,13 @@ export class ReviewController {
     return this.reviewService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewService.update(+id, updateReviewDto);
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateReviewDto: UpdateReviewDto,
+    @Request() req: any,
+  ) {
+    return this.reviewService.update(+id, updateReviewDto, req);
   }
 
   @Delete(':id')

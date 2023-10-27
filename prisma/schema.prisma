@@ -31,7 +31,7 @@ model Location {
 }
 
 model Review {
-  id         Int       @id
+  id         Int       @id @default(autoincrement())
   roomId     Int?
   userId     Int?
   reviewDate DateTime? @db.DateTime(0)

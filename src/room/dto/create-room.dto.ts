@@ -1,21 +1,25 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateRoomDto {
   @IsNotEmpty()
   roomName: string;
 
+  @IsNumber()
   @IsNotEmpty()
   guest: number;
 
+  @IsNumber()
   @IsNotEmpty()
   bedroom: number;
 
+  @IsNumber()
   @IsNotEmpty()
   bed: number;
 
   @IsNotEmpty()
   description: string;
 
+  @IsNumber()
   @IsNotEmpty()
   price: number;
 
@@ -45,6 +49,7 @@ export class CreateRoomDto {
 
   image?: string;
 
+  @IsNumber()
   @IsNotEmpty()
   locationId: number;
 }

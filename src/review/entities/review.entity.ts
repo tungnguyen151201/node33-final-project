@@ -8,4 +8,8 @@ export class ReviewEntity {
   reviewDate: Date;
   star: number;
   detail: string;
+
+  constructor(partial: Partial<ReviewEntity>) {
+    Object.assign(this, partial);
+  }
 }
