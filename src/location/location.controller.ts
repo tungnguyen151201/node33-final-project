@@ -24,25 +24,34 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
+import { UserRole } from 'src/auth/enum/user-role.enum';
+import { Roles } from 'src/decorators/role.decorator';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('location')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Location')
-@ApiBearerAuth()
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
+  /**
+   * Only Admin can create location
+   */
   @Post()
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationService.create(createLocationDto);
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.locationService.findAll();
   }
 
   @Get('search-pagination')
+  @Public()
   @ApiQuery({ name: 'pageIndex', type: Number })
   @ApiQuery({ name: 'pageSize', type: Number })
   @ApiQuery({ name: 'keyword', required: false })
@@ -55,11 +64,17 @@ export class LocationController {
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.locationService.findOne(+id);
   }
 
+  /**
+   * Only Admin can edit location
+   */
   @Put(':id')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   update(
     @Param('id') id: string,
     @Body() updateLocationDto: UpdateLocationDto,
@@ -67,12 +82,22 @@ export class LocationController {
     return this.locationService.update(+id, updateLocationDto);
   }
 
+  /**
+   * Only Admin can delete location
+   */
   @Delete(':id')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.locationService.remove(+id);
   }
 
+  /**
+   * Only Admin can upload location image
+   */
   @Post('upload-image')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImageDto })
   @UseInterceptors(

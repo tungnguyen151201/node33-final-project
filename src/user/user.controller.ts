@@ -31,7 +31,6 @@ import { diskStorage } from 'multer';
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('User')
-@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -42,11 +41,13 @@ export class UserController {
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.userService.findAll();
   }
 
   @Get('search-pagination')
+  @Public()
   @ApiQuery({ name: 'pageIndex', type: Number })
   @ApiQuery({ name: 'pageSize', type: Number })
   @ApiQuery({ name: 'keyword', required: false })
@@ -59,11 +60,13 @@ export class UserController {
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
 
   @Put(':id')
+  @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }
@@ -72,17 +75,20 @@ export class UserController {
    * Only Admin can delete user
    */
   @Delete(':id')
+  @ApiBearerAuth()
   @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
 
   @Get('search/:name')
+  @Public()
   search(@Param('name') keyword: string) {
     return this.userService.search(keyword);
   }
 
   @Post('upload-avatar')
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadAvatarDto })
   @UseInterceptors(
@@ -99,6 +105,7 @@ export class UserController {
   }
 
   @Get('search-email/:email')
+  @Public()
   findOneByEmail(@Param('email') email: string) {
     return this.userService.findOneByEmail(email);
   }

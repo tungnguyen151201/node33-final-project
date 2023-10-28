@@ -24,30 +24,40 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UploadImageDto } from 'src/location/dto/upload-image.dto';
+import { Public } from 'src/decorators/public.decorator';
+import { Roles } from 'src/decorators/role.decorator';
+import { UserRole } from 'src/auth/enum/user-role.enum';
 
 @Controller('room')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('Room')
-@ApiBearerAuth()
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
+  /**
+   * Only Admin can create room
+   */
   @Post()
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   create(@Body() createRoomDto: CreateRoomDto) {
     return this.roomService.create(createRoomDto);
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.roomService.findAll();
   }
 
   @Get('search-by-location')
+  @Public()
   searchByLocation(@Query('locationId') id: string) {
     return this.roomService.searchByLocation(+id);
   }
 
   @Get('search-pagination')
+  @Public()
   @ApiQuery({ name: 'pageIndex', type: Number })
   @ApiQuery({ name: 'pageSize', type: Number })
   @ApiQuery({ name: 'keyword', required: false })
@@ -60,21 +70,37 @@ export class RoomController {
   }
 
   @Get(':id')
+  @Public()
   findOne(@Param('id') id: string) {
     return this.roomService.findOne(+id);
   }
 
+  /**
+   * Only Admin can edit room
+   */
   @Put(':id')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
     return this.roomService.update(+id, updateRoomDto);
   }
 
+  /**
+   * Only Admin can delete room
+   */
   @Delete(':id')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   remove(@Param('id') id: string) {
     return this.roomService.remove(+id);
   }
 
+  /**
+   * Only Admin can upload room image
+   */
   @Post('upload-image')
+  @ApiBearerAuth()
+  @Roles(UserRole.Admin)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImageDto })
   @UseInterceptors(

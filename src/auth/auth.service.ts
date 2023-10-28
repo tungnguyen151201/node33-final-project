@@ -22,6 +22,9 @@ export class AuthService {
     try {
       const { email, password } = signInDto;
       const user = await this.userService.findOneByEmail(email);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
       if (!bcrypt.compareSync(password, user.password)) {
         throw new UnauthorizedException();
       }

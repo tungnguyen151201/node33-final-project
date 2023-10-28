@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -8,6 +9,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { ReviewEntity } from './entities/review.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ReviewService {
@@ -54,10 +56,30 @@ export class ReviewService {
         throw new BadRequestException('Invalid params');
       }
       const data = await this.review.findUnique({
+        include: {
+          User: true,
+          Room: {
+            include: {
+              Location: true,
+            },
+          },
+        },
         where: { id },
       });
       if (!data) return null;
-      return new ReviewEntity({ ...data });
+      const { User, Room } = data;
+      const { Location } = Room;
+      delete data.userId;
+      delete data.roomId;
+      delete data.User;
+      delete data.Room;
+      delete Room.locationId;
+      delete Room.Location;
+      return new ReviewEntity({
+        ...data,
+        user: new UserEntity({ ...User }),
+        room: { ...Room, location: Location },
+      });
     } catch (e) {
       if (e.status === 500) {
         throw new InternalServerErrorException(e.message);
@@ -72,9 +94,14 @@ export class ReviewService {
       }
       const review = await this.findOne(id);
       if (!review) {
-        throw new NotFoundException('review not found!');
+        throw new NotFoundException('Review not found!');
       }
       const userId: number = req.user.id;
+      if (review.user.id !== userId) {
+        throw new ForbiddenException(
+          'You do not have permission to update this review!',
+        );
+      }
       const data = await this.review.update({
         where: { id },
         data: {
@@ -93,7 +120,7 @@ export class ReviewService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, req: any) {
     try {
       if (!id) {
         throw new BadRequestException('Invalid params');
@@ -102,8 +129,31 @@ export class ReviewService {
       if (!review) {
         throw new NotFoundException('Review not found!');
       }
+      const userId: number = req.user.id;
+      if (review.user.id !== userId) {
+        throw new ForbiddenException(
+          'You do not have permission to delete this review!',
+        );
+      }
       const data = await this.review.delete({ where: { id } });
       return new ReviewEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
+  }
+
+  async searchByRoom(roomId: number) {
+    try {
+      if (!roomId) {
+        throw new BadRequestException('Invalid params');
+      }
+      const data = await this.review.findMany({
+        where: { roomId },
+      });
+      if (!data) return [];
+      return data.map((review) => new ReviewEntity({ ...review }));
     } catch (e) {
       if (e.status === 500) {
         throw new InternalServerErrorException(e.message);
