@@ -17,6 +17,7 @@ services:
     depends_on:
       - mysql_db
     build: .
+    container_name: app
     volumes:
       - .:/usr/src/app
     env_file:
