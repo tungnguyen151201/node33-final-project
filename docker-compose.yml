@@ -22,13 +22,9 @@ services:
     env_file:
       - .env
     environment:
-      DB_HOST: mysql_db
-      DB_NAME: $DB_NAME
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_PORT: $DB_PORT
+      DATABASE_URL="mysql://${DB_USER}:${DB_PASSWORD}@$mysql_db:${DB_PORT}/${DB_NAME}?schema=public"
     ports:
-      - 3000:3000
+      - 80:8080
     networks:
       - node-network
 volumes:
