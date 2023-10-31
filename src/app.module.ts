@@ -12,6 +12,8 @@ import { RoomModule } from './room/room.module';
 import { LocationModule } from './location/location.module';
 import { ReviewModule } from './review/review.module';
 import { BookingModule } from './booking/booking.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -27,6 +29,9 @@ import { BookingModule } from './booking/booking.module';
       signOptions: { expiresIn: '1d' },
     }),
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
   ],
   controllers: [AppController],
   providers: [

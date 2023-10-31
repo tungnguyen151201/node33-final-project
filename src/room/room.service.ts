@@ -210,7 +210,7 @@ export class RoomService {
       const data = await this.room.update({
         where: { id },
         data: {
-          image: '/public/img' + file.filename,
+          image: `http://${process.env.DOMAIN_NAME}/images/${file.filename}`,
         },
       });
 

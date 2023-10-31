@@ -94,7 +94,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('avatar', {
       storage: diskStorage({
-        destination: process.cwd() + '/public/img',
+        destination: process.cwd() + '/dist/public/images',
         filename: (_, file, callback) =>
           callback(null, new Date().getTime() + '_' + file.originalname),
       }),

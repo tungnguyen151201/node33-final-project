@@ -189,7 +189,7 @@ export class UserService {
       const data = await this.user.update({
         where: { id: req.user.id },
         data: {
-          avatar: '/public/img' + req.file.filename,
+          avatar: `http://${process.env.DOMAIN_NAME}/images/${req.file.filename}`,
         },
       });
 

@@ -149,7 +149,7 @@ export class LocationService {
       const data = await this.location.update({
         where: { id },
         data: {
-          image: '/public/img' + file.filename,
+          image: `http://${process.env.DOMAIN_NAME}/images/${file.filename}`,
         },
       });
 
