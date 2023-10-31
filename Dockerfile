@@ -47,6 +47,9 @@ ENV NODE_ENV production
 # Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
 RUN yarn install --frozen-lockfile --only=production && yarn cache clean --force
 
+# Copy public folder to dist folder
+RUN yarn copy:public
+
 USER node
 
 ###################
@@ -61,4 +64,4 @@ COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 EXPOSE 8080
 # Start the server using the production build
-CMD [ "yarn", "start:prod" ]
+CMD [ "node", "dist/src/main.js" ]
