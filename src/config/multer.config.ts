@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as fs from 'fs';
 
 export const multerOptions = {
   limits: {
@@ -23,6 +24,12 @@ export const multerOptions = {
       const distPath =
         process.cwd() + `/dist/${process.env.MULTER_DESTINATION}`;
       const rootPath = process.cwd() + `/${process.env.MULTER_DESTINATION}`;
+      if (!fs.existsSync(distPath)) {
+        fs.mkdirSync(distPath, { recursive: true });
+      }
+      if (!fs.existsSync(rootPath)) {
+        fs.mkdirSync(rootPath, { recursive: true });
+      }
       callback(null, distPath);
       callback(null, rootPath);
     },
