@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateRoomDto {
   @IsNotEmpty()
@@ -23,27 +23,35 @@ export class CreateRoomDto {
   @IsNotEmpty()
   price: number;
 
+  @IsBoolean()
   @IsNotEmpty()
   washingMachine: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   iron: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   television: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   airConditioner: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   wifi: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   stove: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   parkingLot: boolean;
 
+  @IsBoolean()
   @IsNotEmpty()
   swimmingPool: boolean;
 

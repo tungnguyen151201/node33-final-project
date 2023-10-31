@@ -18,24 +18,30 @@ export class ReviewService {
   private review = this.prisma.review;
   private room = this.prisma.room;
   async create(createReviewDto: CreateReviewDto, req: any) {
-    const room = await this.room.findFirst({
-      where: { id: createReviewDto.roomId },
-    });
-    if (!room) {
-      throw new BadRequestException('Room not found!');
-    }
+    try {
+      const room = await this.room.findFirst({
+        where: { id: createReviewDto.roomId },
+      });
+      if (!room) {
+        throw new BadRequestException('Room not found!');
+      }
 
-    const newReview: CreateReviewDto = {
-      roomId: createReviewDto.roomId,
-      reviewDate: new Date(createReviewDto.reviewDate),
-      star: createReviewDto.star,
-      detail: createReviewDto.detail,
-    };
-    const userId: number = req.user.id;
-    const data = await this.review.create({
-      data: { ...newReview, userId },
-    });
-    return new ReviewEntity({ ...data });
+      const newReview: CreateReviewDto = {
+        roomId: createReviewDto.roomId,
+        reviewDate: new Date(createReviewDto.reviewDate),
+        star: createReviewDto.star,
+        detail: createReviewDto.detail,
+      };
+      const userId: number = req.user.id;
+      const data = await this.review.create({
+        data: { ...newReview, userId },
+      });
+      return new ReviewEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 
   async findAll() {
@@ -101,6 +107,12 @@ export class ReviewService {
         throw new ForbiddenException(
           'You do not have permission to update this review!',
         );
+      }
+      const room = await this.room.findFirst({
+        where: { id: updateReviewDto.roomId },
+      });
+      if (!room) {
+        throw new BadRequestException('Room not found!');
       }
       const data = await this.review.update({
         where: { id },

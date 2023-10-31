@@ -15,14 +15,20 @@ export class LocationService {
 
   private location = this.prisma.location;
   async create(createLocationDto: CreateLocationDto) {
-    const newLocation: CreateLocationDto = {
-      locationName: createLocationDto.locationName,
-      province: createLocationDto.province,
-      country: createLocationDto.country,
-      image: createLocationDto.image,
-    };
-    const data = await this.location.create({ data: newLocation });
-    return new LocationEntity({ ...data });
+    try {
+      const newLocation: CreateLocationDto = {
+        locationName: createLocationDto.locationName,
+        province: createLocationDto.province,
+        country: createLocationDto.country,
+        image: createLocationDto.image,
+      };
+      const data = await this.location.create({ data: newLocation });
+      return new LocationEntity({ ...data });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
+    }
   }
 
   async findAll() {

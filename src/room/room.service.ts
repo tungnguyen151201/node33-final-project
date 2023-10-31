@@ -16,34 +16,40 @@ export class RoomService {
   private room = this.prisma.room;
   private location = this.prisma.location;
   async create(createRoomDto: CreateRoomDto) {
-    const location = await this.location.findFirst({
-      where: { id: createRoomDto.locationId },
-    });
+    try {
+      const location = await this.location.findFirst({
+        where: { id: createRoomDto.locationId },
+      });
 
-    if (!location) {
-      throw new BadRequestException('Location not found!');
+      if (!location) {
+        throw new BadRequestException('Location not found!');
+      }
+      const newRoom: CreateRoomDto = {
+        roomName: createRoomDto.roomName,
+        guest: createRoomDto.guest,
+        bedroom: createRoomDto.bedroom,
+        bed: createRoomDto.bed,
+        description: createRoomDto.description,
+        price: createRoomDto.price,
+        washingMachine: createRoomDto.washingMachine,
+        iron: createRoomDto.iron,
+        television: createRoomDto.television,
+        airConditioner: createRoomDto.airConditioner,
+        wifi: createRoomDto.wifi,
+        stove: createRoomDto.stove,
+        parkingLot: createRoomDto.parkingLot,
+        swimmingPool: createRoomDto.swimmingPool,
+        image: createRoomDto.image,
+        locationId: createRoomDto.locationId,
+      };
+      const data = await this.room.create({ data: newRoom });
+      delete data.locationId;
+      return new RoomEntity({ ...data, location });
+    } catch (e) {
+      if (e.status === 500) {
+        throw new InternalServerErrorException(e.message);
+      } else throw e;
     }
-    const newRoom: CreateRoomDto = {
-      roomName: createRoomDto.roomName,
-      guest: createRoomDto.guest,
-      bedroom: createRoomDto.bedroom,
-      bed: createRoomDto.bed,
-      description: createRoomDto.description,
-      price: createRoomDto.price,
-      washingMachine: createRoomDto.washingMachine,
-      iron: createRoomDto.iron,
-      television: createRoomDto.television,
-      airConditioner: createRoomDto.airConditioner,
-      wifi: createRoomDto.wifi,
-      stove: createRoomDto.stove,
-      parkingLot: createRoomDto.parkingLot,
-      swimmingPool: createRoomDto.swimmingPool,
-      image: createRoomDto.image,
-      locationId: createRoomDto.locationId,
-    };
-    const data = await this.room.create({ data: newRoom });
-    delete data.locationId;
-    return new RoomEntity({ ...data, location });
   }
 
   async findAll() {
@@ -101,6 +107,14 @@ export class RoomService {
       const room = await this.findOne(id);
       if (!room) {
         throw new NotFoundException('Room not found!');
+      }
+
+      const location = await this.location.findFirst({
+        where: { id: updateRoomDto.locationId },
+      });
+
+      if (!location) {
+        throw new BadRequestException('Location not found!');
       }
       const data = await this.room.update({
         where: { id },
