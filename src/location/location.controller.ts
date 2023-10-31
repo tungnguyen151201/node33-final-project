@@ -22,11 +22,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { UserRole } from 'src/auth/enum/user-role.enum';
 import { Roles } from 'src/decorators/role.decorator';
 import { Public } from 'src/decorators/public.decorator';
+import { multerOptions } from 'src/config/multer.config';
 
 @Controller('location')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -100,15 +100,7 @@ export class LocationController {
   @Roles(UserRole.Admin)
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadImageDto })
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: process.cwd() + '/dist/public/images',
-        filename: (_, file, callback) =>
-          callback(null, new Date().getTime() + '_' + file.originalname),
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('image', multerOptions))
   uploadImage(
     @Query('locationId') id: string,
     @UploadedFile() file: Express.Multer.File,

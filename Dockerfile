@@ -61,4 +61,4 @@ COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 EXPOSE 8080
 # Start the server using the production build
-CMD [ "node", "dist/src/main.js" ]
+CMD [ "yarn", "start:prod" ]

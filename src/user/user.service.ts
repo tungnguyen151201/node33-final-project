@@ -179,9 +179,9 @@ export class UserService {
     }
   }
 
-  async uploadAvatar(req: any) {
+  async uploadAvatar(file: Express.Multer.File, req: any) {
     try {
-      if (!req.file) {
+      if (!file) {
         throw new InternalServerErrorException(
           'Upload failed. Please try again later!',
         );
@@ -189,7 +189,7 @@ export class UserService {
       const data = await this.user.update({
         where: { id: req.user.id },
         data: {
-          avatar: `http://${process.env.DOMAIN_NAME}/images/${req.file.filename}`,
+          avatar: `http://${process.env.DOMAIN_NAME}/images/${file.filename}`,
         },
       });
 

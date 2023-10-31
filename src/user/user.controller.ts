@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   Request,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -26,7 +27,7 @@ import { UserRole } from 'src/auth/enum/user-role.enum';
 import { Public } from 'src/decorators/public.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadAvatarDto } from './dto/upload-avatar.dto';
-import { diskStorage } from 'multer';
+import { multerOptions } from 'src/config/multer.config';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -91,17 +92,9 @@ export class UserController {
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadAvatarDto })
-  @UseInterceptors(
-    FileInterceptor('avatar', {
-      storage: diskStorage({
-        destination: process.cwd() + '/dist/public/images',
-        filename: (_, file, callback) =>
-          callback(null, new Date().getTime() + '_' + file.originalname),
-      }),
-    }),
-  )
-  uploadAvatar(@Request() req: any) {
-    return this.userService.uploadAvatar(req);
+  @UseInterceptors(FileInterceptor('avatar', multerOptions))
+  uploadAvatar(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
+    return this.userService.uploadAvatar(file, req);
   }
 
   @Get('search-email/:email')
