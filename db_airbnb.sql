@@ -20,7 +20,7 @@ CREATE TABLE `Booking` (
   KEY `user` (`userId`),
   CONSTRAINT `Booking_ibfk_1` FOREIGN KEY (`roomId`) REFERENCES `Room` (`id`),
   CONSTRAINT `Booking_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `User` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `Location`;
 CREATE TABLE `Location` (
@@ -87,6 +87,10 @@ CREATE TABLE `User` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+INSERT INTO `Booking` (`id`, `roomId`, `checkInDate`, `checkOutDate`, `guestNumber`, `userId`) VALUES
+(1, 1, '2023-10-27 00:00:00', '2023-10-28 00:00:00', 2, 1);
+INSERT INTO `Booking` (`id`, `roomId`, `checkInDate`, `checkOutDate`, `guestNumber`, `userId`) VALUES
+(2, 1, '2023-10-27 00:00:00', '2023-10-28 00:00:00', 3, 1);
 
 
 INSERT INTO `Location` (`id`, `locationName`, `province`, `country`, `image`) VALUES
@@ -111,7 +115,7 @@ INSERT INTO `Room` (`id`, `roomName`, `guest`, `bedroom`, `bed`, `description`, 
 
 
 INSERT INTO `User` (`id`, `name`, `email`, `password`, `phone`, `birthday`, `gender`, `role`, `avatar`) VALUES
-(1, 'Admin', 'admin@gmail.com', '$2b$10$bU15KhVdRkFx7FeTm3SVHeIO4rNKuLlmf.iTjftlG62rPO6znLw.u', '0123456789', '01/10/2001', 'male', 'Admin', '/public/img1698382471450_avt_meo.jpg');
+(1, 'Admin', 'admin@gmail.com', '$2b$10$bU15KhVdRkFx7FeTm3SVHeIO4rNKuLlmf.iTjftlG62rPO6znLw.u', '0123456789', '01/10/2001', 'male', 'Admin', 'http://localhost:8080/images/1698737945491_avt_meo.jpg');
 INSERT INTO `User` (`id`, `name`, `email`, `password`, `phone`, `birthday`, `gender`, `role`, `avatar`) VALUES
 (3, 'User', 'user2@gmail.com', '$2b$10$SIAaqueVANc/VLK.0BXI9efkgQbimxo9MwmUN3h.WHB2JJleAwgYq', '0123456789', '01/10/2001', 'male', 'User', NULL);
 INSERT INTO `User` (`id`, `name`, `email`, `password`, `phone`, `birthday`, `gender`, `role`, `avatar`) VALUES
